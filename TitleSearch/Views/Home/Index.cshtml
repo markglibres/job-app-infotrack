@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="panel panel-default" ng-controller="GoogleRankingController">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Google Search Rankings</div>
+    <div class="panel-body">
+        <form ng-submit="form.$valid && searchRanking()" name="form" novalidate>
+            <div class="form-group">
+                <label for="urlToSearch">Url to search</label>
+                <input type="text" class="form-control" id="urlToSearch" name="urlToSearch" placeholder="Enter url to search" ng-model="urlToSearch" required ng-pattern="/(https?:\/\/)?([^\.]+\.){1,}.+/" />
+                <small id="emailHelp" class="alert-danger" ng-show="!form.urlToSearch.$valid">Please enter a valid url format.</small>
+            </div>
+            <div class="form-group">
+                <label for="searchTerm">Search keywords</label>
+                <input type="text" class="form-control" id="searchTerm" name="searchTerm" placeholder="Keywords to search" ng-model="searchTerm" required>
+                <small id="emailHelp" class="alert-danger" ng-show="!form.searchTerm.$valid">Please enter a valid search term.</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button><span ng-show="loading"><img src="images/loading.gif" /><span>Please wait...</span></span>
+        </form>
+    </div>
+
+    <!-- List group -->
+    <ul class="list-group results">
+        <li class="list-group-item">
+            <span class="url">Url</span>
+            <span class="page count">Page</span>
+            <span class="rank count">Rank</span>
+        </li>
+        <li class="list-group-item" ng-repeat="ranking in rankings">
+            <span class="url"><a href="{{ranking.url}}" target="_blank">{{ranking.url}}</a></span>
+            <span class="page count">{{ranking.page}}</span>
+            <span class="rank count">{{ranking.rank}}</span>
+        </li>
+    </ul>
+</div>
+
