@@ -78,8 +78,7 @@ namespace TitleSearch.Core.Utility
                     Page = page,
                     Rank = ++currentRank,
                     Url = resultUrl
-                })
-                .ToList();
+                });
         }
     }
 }
