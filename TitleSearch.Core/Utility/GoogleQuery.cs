@@ -3,13 +3,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using TitleSearch.Core.Models;
 using TitleSearch.Core.Utility.Interface;
 
 namespace TitleSearch.Core.Utility
 {
     public class GoogleQuery : IGoogleQuery
     {
-        private const int _itemsPerPage = 10;
         private const string _resultItemPattern = "<h3\\s+?class=\"r\">(.+?)</h3>";
         private const string _resultItemPrimaryUrlPattern = "href=\"(http[^\"]+)";
         private const string _resultItemSecondaryUrlPattern = "q=([^\"\\s]+)";
@@ -20,6 +20,7 @@ namespace TitleSearch.Core.Utility
         }
 
         private IWebHelper _webHelper { get; }
+        public int ItemsPerPage => 10;
 
         private List<string> _googleInjectedParamsPattern => new List<string>
         {
@@ -31,7 +32,7 @@ namespace TitleSearch.Core.Utility
         public string BuildUrl(string searchTerm, int page)
         {
             return
-                $"https://www.google.com.au/search?q={HttpUtility.UrlEncode(searchTerm)}&start={(page - 1) * _itemsPerPage}";
+                $"https://www.google.com.au/search?q={HttpUtility.UrlEncode(searchTerm)}&start={(page - 1) * ItemsPerPage}";
         }
 
         public async Task<IEnumerable<string>> GetHtmlResults(string searchTerm, int page)
@@ -62,8 +63,30 @@ namespace TitleSearch.Core.Utility
 
         public int TotalPage(int maxRank)
         {
-            var mod = maxRank % _itemsPerPage;
-            return maxRank / _itemsPerPage + (mod > 0 ? 1 : 0);
+            var mod = maxRank % ItemsPerPage;
+            return maxRank / ItemsPerPage + (mod > 0 ? 1 : 0);
+        }
+
+        public async Task<IEnumerable<GoogleRankResult>> GetRankingsAsync(string searchTerm, int page)
+        {
+            var results = await GetHtmlResults(searchTerm, page);
+            var currentRank = (page - 1) * ItemsPerPage;
+            var rankings = new List<GoogleRankResult>();
+
+            foreach (var result in results)
+            {
+                currentRank++;
+                var resultUrl = GetUrlResult(result);
+
+                rankings.Add(new GoogleRankResult
+                {
+                    Page = page,
+                    Rank = currentRank,
+                    Url = resultUrl
+                });
+            }
+
+            return rankings;
         }
     }
 }

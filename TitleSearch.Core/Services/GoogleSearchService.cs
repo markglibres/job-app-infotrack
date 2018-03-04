@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TitleSearch.Core.Models;
 using TitleSearch.Core.Services.Interface;
@@ -22,30 +23,17 @@ namespace TitleSearch.Core.Services
             int maxRank = 100)
         {
             var rankings = new List<GoogleRankResult>();
-
             var maxPage = _googleQuery.TotalPage(maxRank);
-            var currentRank = 0;
 
             for (var page = 1; page <= maxPage; page++)
             {
-                var results = await _googleQuery.GetHtmlResults(searchTerm, page);
-                foreach (var result in results)
-                {
-                    currentRank++;
-                    var resultUrl = _googleQuery.GetUrlResult(result);
-                    if (_domainService.IsSameHost(url, resultUrl))
-                    {
-                        rankings.Add(new GoogleRankResult
-                        {
-                            Page = page,
-                            Rank = currentRank,
-                            Url = resultUrl
-                        });
-                    }
-                }
+                var pageRankings = await _googleQuery.GetRankingsAsync(searchTerm, page);
+                rankings.AddRange(pageRankings.Where(ranking => _domainService.IsSameHost(url,ranking.Url)));
+                
             }
 
             return rankings;
         }
+        
     }
 }
