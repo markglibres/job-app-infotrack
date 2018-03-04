@@ -71,22 +71,15 @@ namespace TitleSearch.Core.Utility
         {
             var results = await GetHtmlResults(searchTerm, page);
             var currentRank = (page - 1) * ItemsPerPage;
-            var rankings = new List<GoogleRankResult>();
 
-            foreach (var result in results)
-            {
-                currentRank++;
-                var resultUrl = GetUrlResult(result);
-
-                rankings.Add(new GoogleRankResult
+            return results.Select(GetUrlResult)
+                .Select(resultUrl => new GoogleRankResult
                 {
                     Page = page,
-                    Rank = currentRank,
+                    Rank = ++currentRank,
                     Url = resultUrl
-                });
-            }
-
-            return rankings;
+                })
+                .ToList();
         }
     }
 }
