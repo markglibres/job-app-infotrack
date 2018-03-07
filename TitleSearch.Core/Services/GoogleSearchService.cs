@@ -9,15 +9,15 @@ namespace TitleSearch.Core.Services
 {
     public class GoogleSearchService : IGoogleSearchService
     {
+        private readonly IDomainService _domainService;
+        private readonly IGoogleQuery _googleQuery;
+        
         public GoogleSearchService(IDomainService domainService,
             IGoogleQuery googleQuery)
         {
             _domainService = domainService;
             _googleQuery = googleQuery;
         }
-
-        private IDomainService _domainService { get; }
-        private IGoogleQuery _googleQuery { get; }
 
         public async Task<IEnumerable<GoogleRankResult>> GetRankingsAsync(string url, string searchTerm,
             int maxRank = 100)
