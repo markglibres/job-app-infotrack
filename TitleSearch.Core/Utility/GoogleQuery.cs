@@ -10,6 +10,9 @@ namespace TitleSearch.Core.Utility
 {
     public class GoogleQuery : IGoogleQuery
     {
+        private readonly IWebHelper _webHelper;
+        public int ItemsPerPage => 10;
+        
         private const string _resultItemPattern = "<h3\\s+?class=\"r\">(.+?)</h3>";
         private const string _resultItemPrimaryUrlPattern = "href=\"(http[^\"]+)";
         private const string _resultItemSecondaryUrlPattern = "q=([^\"\\s]+)";
@@ -18,9 +21,6 @@ namespace TitleSearch.Core.Utility
         {
             _webHelper = webHelper;
         }
-
-        private IWebHelper _webHelper { get; }
-        public int ItemsPerPage => 10;
 
         private List<string> _googleInjectedParamsPattern => new List<string>
         {
